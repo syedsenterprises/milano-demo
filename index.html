@@ -899,10 +899,18 @@
     var nc=document.getElementById('navCartCount');
     if(nc){ nc.hidden = c===0; nc.textContent=c; }
     document.querySelectorAll('[data-add]').forEach(function(b){
-      var inCart = !!cart[b.getAttribute('data-add')];
-      b.classList.toggle('added', inCart);
-      if(b.textContent.trim()==='Add' || b.textContent.trim()==='Added ✓'){ b.textContent = inCart ? 'Added ✓' : 'Add'; }
-      else if(b.textContent.indexOf('Add to order')===0 || b.textContent.indexOf('Added')===0){ b.textContent = inCart ? 'Added ✓ — tap for +1' : 'Add to order'; }
+      var name=b.getAttribute('data-add');
+      var qty=cart[name]||0;
+      if(!b.getAttribute('data-label')){ b.setAttribute('data-label', b.textContent.trim()); }
+      var base=b.getAttribute('data-label');
+      b.classList.toggle('added', qty>0);
+      if(qty>0){
+        b.textContent = base==='Add' ? ('✓ '+qty+' in cart — tap for +1') : ('✓ '+qty+' in cart — tap to add one more');
+        b.setAttribute('aria-label', qty+' × '+name+' in your order. Tap to add one more.');
+      } else {
+        b.textContent = base;
+        b.removeAttribute('aria-label');
+      }
     });
   }
   document.addEventListener('click', function(e){
